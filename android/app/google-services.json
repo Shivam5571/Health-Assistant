@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "237819633482",
+    "project_id": "healthyfly",
+    "storage_bucket": "healthyfly.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237819633482:android:188b9ce7341768b9526bb3",
+        "android_client_info": {
+          "package_name": "com.example.healthfly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "237819633482-3m9ilv1i468r7pnqqa5a1uu2uv9l13ma.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.healthfly",
+            "certificate_hash": "10a74eecdea2a2ece150e96c89b613470b327fbb"
+          }
+        },
+        {
+          "client_id": "237819633482-v57u5u9v77s3soak92k6gull8kh60hon.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKp0LPP7hFt9E6TfCKeOVGqi_MBVREKTY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "237819633482-v57u5u9v77s3soak92k6gull8kh60hon.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
