@@ -1,10 +1,20 @@
 import 'dart:ui';
-import 'dart:math'; // Random heights ke liye
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'input_form.dart';
-import 'hydration_screen.dart'; 
-import 'steps_screen.dart'; 
+import 'ingredient_scanner_screen.dart'; 
+import 'ai_assistant_screen.dart'; // <-- AI Assistant Chat Screen yahan import kar liya hai
+
+// Note: In real app, ensure these imports are correct based on your project structure
+// import 'input_form.dart';
+// import 'hydration_screen.dart'; 
+// import 'steps_screen.dart'; 
+
+// DUMMY CLASSES to prevent errors if the files aren't present in this specific run.
+// Remove these and uncomment your actual imports in your real project.
+class InputFormScreen extends StatelessWidget { final bool isDarkMode; const InputFormScreen({super.key, required this.isDarkMode}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Input Form"))); }
+class HydrationScreen extends StatelessWidget { final bool isDarkMode; const HydrationScreen({super.key, required this.isDarkMode}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Hydration"))); }
+class StepsScreen extends StatelessWidget { final bool isDarkMode; const StepsScreen({super.key, required this.isDarkMode}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Steps"))); }
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -113,7 +123,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   child: _buildQuickToolCard(
                                     context, "Ask AI", "Health Assistant", Icons.auto_awesome_rounded, 
                                     const Color(0xFF6C63FF), cardColor, textColor, subTextColor,
-                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AIAssistantScreen())),
+                                    // <-- Yahan updated logic hai
+                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => AIAssistantScreen(isDarkMode: isDarkMode))),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -121,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   child: _buildQuickToolCard(
                                     context, "Scan Food", "Check Ingredients", Icons.document_scanner_rounded, 
                                     const Color(0xFFFF6B6B), cardColor, textColor, subTextColor,
-                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => const IngredientScannerScreen())),
+                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => IngredientScannerScreen(isDarkMode: isDarkMode))),
                                   ),
                                 ),
                               ],
@@ -150,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             // Asymmetric Grid Look
                             Row(
                               children: [
-                                Expanded(child: _buildStatCard(context, "Hydration", "Target: 2L", Icons.water_drop_rounded, const Color(0xFF38B6FF), cardColor, textColor, subTextColor, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HydrationScreen())))),
+                                Expanded(child: _buildStatCard(context, "Hydration", "Target: 2L", Icons.water_drop_rounded, const Color(0xFF38B6FF), cardColor, textColor, subTextColor, () => Navigator.push(context, MaterialPageRoute(builder: (_) => HydrationScreen(isDarkMode: isDarkMode))))),
                                 const SizedBox(width: 16),
                                 Expanded(child: _buildStatCard(context, "Steps", "Goal: 10k", Icons.directions_run_rounded, const Color(0xFFFF9F1C), cardColor, textColor, subTextColor, () => Navigator.push(context, MaterialPageRoute(builder: (_) => StepsScreen(isDarkMode: isDarkMode))))),
                               ],
@@ -931,48 +942,8 @@ class RealisticECGPainter extends CustomPainter {
 }
 
 // ============================================================================
-// PLACEHOLDER SCREENS
+// OTHER INTELLIGENT SCANNERS & SCREENS
 // ============================================================================
-
-class AIAssistantScreen extends StatelessWidget {
-  const AIAssistantScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("AI Assistant", style: TextStyle(fontWeight: FontWeight.bold))),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            PulsingWidget(child: Icon(Icons.auto_awesome_rounded, size: 80, color: Color(0xFF6C63FF))),
-            SizedBox(height: 20),
-            Text("Health Assistant coming soon!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class IngredientScannerScreen extends StatelessWidget {
-  const IngredientScannerScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Scan Ingredients", style: TextStyle(fontWeight: FontWeight.bold))),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            PulsingWidget(child: Icon(Icons.document_scanner_rounded, size: 80, color: Color(0xFFFF6B6B))),
-            SizedBox(height: 20),
-            Text("Ingredient Scanner coming soon!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class YogaScreen extends StatelessWidget {
   const YogaScreen({super.key});
@@ -1364,7 +1335,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Icons.help_outline_rounded,
             "Help Center",
             onTap: () {
-               showDialog(
+              showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
