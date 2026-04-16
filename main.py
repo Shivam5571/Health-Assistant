@@ -1,7 +1,7 @@
-# API Backend (FastAPI) - Run using: uvicorn backend:app --host 0.0.0.0 --port 8000
+# API Backend (FastAPI) - Run using: uvicorn main:app --host 0.0.0.0 --port 8000
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
-import google.generativeai as genai
+from openai import OpenAI
 import os
 
 app = FastAPI()
@@ -15,38 +15,51 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Gemini API Key setup (Render environment variables se lega)
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+# OpenAI API Key setup (Render environment variables se lega)
+# Ensure you add OPENAI_API_KEY in your Render dashboard
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-# Gemini 1.5 Flash model text aur image/PDF dono ke liye best hai
-model = genai.GenerativeModel('gemini-pro')
+# Initialize OpenAI client
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 @app.post("/api/chat")
 async def chat_with_ai(
     userText: str = Form(...),
     userName: str = Form("User"),
     userContext: str = Form(""),
-    extractedText: str = Form("") # Naya field: Phone OCR karke text yahan bhejegaa
+    extractedText: str = Form("") # Phone OCR karke text yahan bhejega
 ):
     try:
-        # Prompt banana
-        prompt = (
+        # System prompt: AI ko uska role aur context batane ke liye
+        system_prompt = (
             f"Tum ek friendly aur expert health assistant ho. User ka naam {userName} hai. "
             f"User ka context aur medical background: {userContext}. "
-            f"Tumhe user ke sawal ka asaan Hinglish (Hindi+English) mein jawab dena hai. "
+            f"Tumhe user ke sawal ka asaan Hinglish (Hindi+English) mein jawab dena hai."
         )
+        
+        # User message construct karna
+        user_message = ""
         
         # Agar phone ne kisi image/PDF se text nikal kar bheja hai
         if extractedText.strip():
-            prompt += f"\n\nUser ne ek medical document/report attach ki hai, jiska text ye raha:\n'''{extractedText}'''\nIs report ko dhyan se analyze karo aur user ko asaan bhasha mein samjhao."
+            user_message += f"User ne ek medical document/report attach ki hai, jiska text ye raha:\n'''{extractedText}'''\nIs report ko dhyan se analyze karo aur user ko asaan bhasha mein samjhao.\n\n"
             
-        prompt += f"\n\nUser ka sawal: {userText}"
+        user_message += f"User ka sawal: {userText}"
 
-        # Gemini model se response generate karna (Ab sirf text prompt jaayega)
-        response = model.generate_content(prompt)
+        # OpenAI (ChatGPT) model se response generate karna (gpt-4o-mini is fast & cost-effective)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini", # Aap "gpt-3.5-turbo" bhi use kar sakte hain
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ]
+        )
 
-        return {"status": "success", "reply": response.text}
+        # ChatGPT ka reply nikalna
+        reply = response.choices[0].message.content
+
+        return {"status": "success", "reply": reply}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    	
