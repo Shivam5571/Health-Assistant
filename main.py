@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # Gemini API Key setup (Render environment variables se lega)
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Gemini 1.5 Flash model text aur image/PDF dono ke liye best hai
