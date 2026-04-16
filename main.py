@@ -1,7 +1,7 @@
 # API Backend (FastAPI) - Run using: uvicorn main:app --host 0.0.0.0 --port 8000
 from fastapi import FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
-import google.generativeai as genai
+import requests
 import os
 
 app = FastAPI()
@@ -15,16 +15,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Gemini API Key setup (Render environment variables se lega)
+# Gemini API Key setup
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-else:
-    print("Warning: GEMINI_API_KEY environment variable not found.")
-
-# Gemini model set karna ('gemini-1.5-flash' fast aur reliable hai)
-model = genai.GenerativeModel('gemini-1.5-flash')
 
 @app.post("/api/chat")
 async def chat_with_ai(
@@ -34,14 +26,16 @@ async def chat_with_ai(
     extractedText: str = Form("") # Phone OCR karke text yahan bhejega
 ):
     try:
-        # AI ko uska role samjhane ke liye Prompt banana
+        if not GEMINI_API_KEY:
+            return {"status": "error", "message": "API Key missing in Render Environment!"}
+
+        # Prompt banana
         prompt = (
             f"Tum ek friendly aur expert health assistant ho. User ka naam {userName} hai. "
             f"User ka context aur medical background: {userContext}. "
             f"Tumhe user ke sawal ka asaan Hinglish (Hindi+English) mein jawab dena hai.\n"
         )
         
-        # Agar phone ne kisi image/PDF se text nikal kar bheja hai toh usko prompt mein jorna
         if extractedText.strip():
             prompt += (
                 f"\nUser ne ek medical document/report attach ki hai, jiska text ye raha:\n"
@@ -51,10 +45,27 @@ async def chat_with_ai(
             
         prompt += f"\nUser ka sawal: {userText}"
 
-        # Gemini model se response generate karna
-        response = model.generate_content(prompt)
+        # Google Generative AI SDK ke bina Direct API Call (Ye kabhi version error nahi dega)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+        
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}]
+        }
+        
+        headers = {"Content-Type": "application/json"}
 
-        return {"status": "success", "reply": response.text}
+        # API Request bhejna
+        response = requests.post(url, json=payload, headers=headers)
+        data = response.json()
+
+        # Agar API se error aaye (jaise invalid key)
+        if response.status_code != 200:
+            return {"status": "error", "message": f"Google API Error: {data.get('error', {}).get('message', 'Unknown error')}"}
+
+        # Reply nikalna
+        reply_text = data['candidates'][0]['content']['parts'][0]['text']
+
+        return {"status": "success", "reply": reply_text}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
