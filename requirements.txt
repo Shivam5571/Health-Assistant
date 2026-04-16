@@ -1,5 +1,7 @@
 fastapi
 uvicorn
-google-generativeai
-pillow
+pymongo
+scikit-learn
+openai
+python-dotenv
 python-multipart
