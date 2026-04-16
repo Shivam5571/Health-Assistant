@@ -1,7 +1,7 @@
 fastapi
 uvicorn
+python-multipart
+requests
 pymongo
 scikit-learn
-google-generativeai>=0.8.0
 python-dotenv
-python-multipart
